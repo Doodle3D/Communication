@@ -1,0 +1,9 @@
+{
+    "jscodehints.detectedExclusions": [
+        "/Applications/AMPPS/www/nodejs/Communication/node_modules/socket.io/node_modules/engine.io/node_modules/engine.io-parser/node_modules/arraybuffer.slice/index.js",
+        "/Applications/AMPPS/www/nodejs/Communication/client.js",
+        "/Applications/AMPPS/www/nodejs/Communication/node_modules/socket.io/node_modules/engine.io/node_modules/engine.io-parser/node_modules/base64-arraybuffer/lib/base64-arraybuffer.js",
+        "/Applications/AMPPS/www/nodejs/Communication/node_modules/socket.io/node_modules/engine.io/node_modules/engine.io-parser/node_modules/after/index.js",
+        "/Applications/AMPPS/www/nodejs/Communication/server.js"
+    ]
+}

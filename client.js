@@ -38,12 +38,12 @@ toBackendRadio.onchange = toPrinterRadio.onchange = function() {
 };
 
 /////// SOCKET TO BACKEND ///////
-var backendSocket = io("localhost:3000?key=CsCeMtYJALkn");
+var backendSocket = io("http://localhost:3000?key=CsCeMtYJALkn");
 var backendPrinterNSP;
 
 backendSocket.on('connect', function(){
   console.log("connected to backend root nsp");
-  backendPrinterNSP = io.connect("localhost:3000/printer?key=CsCeMtYJALkn");
+  backendPrinterNSP = io.connect("http://localhost:3000/printer?key=CsCeMtYJALkn");
   backendPrinterNSP.on('connect', function(){
     console.log("connected to backend printer nsp");
     
@@ -54,11 +54,11 @@ backendSocket.on('connect', function(){
 });
 
 /////// SOCKET TO PRINTER ///////
-var printerSocket = io("localhost:4000?key=CsCeMtYJALkn");
+var printerSocket = io("http://localhost:4000?key=CsCeMtYJALkn");
 var printerPrinterNSP;
 printerSocket.on('connect', function(){
   console.log("connected to printer root nsp");
-  printerPrinterNSP = io.connect("localhost:4000/printer?key=CsCeMtYJALkn");
+  printerPrinterNSP = io.connect("http://localhost:4000/printer?key=CsCeMtYJALkn");
   printerPrinterNSP.on('connect', function(){
     console.log("connected to printer printer nsp");
     

@@ -14,14 +14,13 @@ rootNSP.on('connection', function(socket){
   
   switch(socket.handshake.query.type) {
     case "printer":
-      console.log("rootNSP: new printer connection: ",socket.id);
+      console.log("/: new printer connection: ",socket.id);
       printerSocket = socket;      
       break;
     default: 
-      console.log("rootNSP: new user connection: ",socket.id);
+      console.log("/: new user connection: ",socket.id);
       break;
   }
-  
   socket.on('disconnect', function(){
     console.log("printerNSP: disconnect: ",socket.id);
     printerSocket = null;
@@ -31,38 +30,42 @@ rootNSP.on('connection', function(socket){
 var printerNSP = io.of("/printer");
 printerNSP.on('connection', function(socket){
   
-  switch(socket.handshake.query.type) {
+  var type = socket.handshake.query.type;
+  if(type === "printer") printerPrinterSocket = socket;
+  
+  switch(type) {
     case "printer":
-      console.log("printerNSP: new printer connection: ",socket.id);
-      printerPrinterSocket = socket;
-      // forward events from printer to clients
-      socket.on("temperatures",function(data) {
-        console.log("printer temperature change");
-        // broadcast to other clients in namespace
-        socket.broadcast.emit("temperatures",data);
-      });
+      console.log("/printer: new printer connection: ",socket.id);
       break;
     default: 
-      console.log("printerNSP: new user connection: ",socket.id);
+      console.log("/printer: new user connection: ",socket.id);
       break;
   }
   
+  var oneventHandler = socket.onevent;
+  socket.onevent = function() {
+    oneventHandler.apply(this,arguments);
+    var packet = arguments[0];
+    var type = packet.data[0];
+    var data = packet.data[1];
+    var callback = packet.data[2];
+    console.log("Event: ",type,data);
+    if(socket === printerPrinterSocket) {
+      // forward all events from printer to other clients in namespace
+      printerPrinterSocket.broadcast.emit(type,data);
+    } else {
+      // forward all events from clients to printer
+      if(printerPrinterSocket === null) {
+        if(callback) callback({err:"Printer not available"});
+        return; 
+      }
+      printerPrinterSocket.emit(type,data,function(response) {
+        callback(response);
+      });
+    }
+  };
   socket.on('disconnect', function(){
     console.log("printerNSP: disconnect: ",socket.id);
     printerPrinterSocket = null;
-  });
-  // forward events from clients to printer
-  socket.on('setTemperatures', function(data,callback){
-    console.log("printerNSP: setTemperatures: ",data);
-    
-    if(printerPrinterSocket === undefined || printerPrinterSocket === null) {
-      if(callback) {
-        callback({err:"Printer not connected"});
-      }
-      return;
-    }
-    printerPrinterSocket.emit("setTemperatures",data,function(response){
-      callback(response);
-    });
   });
 });
